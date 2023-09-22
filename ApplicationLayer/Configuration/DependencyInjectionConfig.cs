@@ -1,4 +1,5 @@
-﻿using DomainLayer.Interfaces.Service;
+﻿using DomainLayer.Interfaces.Repository;
+using DomainLayer.Interfaces.Service;
 using ServiceLayer;
 
 namespace ApplicationLayer.Configuration
@@ -36,7 +37,9 @@ namespace ApplicationLayer.Configuration
         /// Configura as dependencias da camada de infraestrutura
         /// </summary>
         /// <param name="services"></param>
-        private static void ConfigureInfrastructureLayer(IServiceCollection services) { }
+        private static void ConfigureInfrastructureLayer(IServiceCollection services) {
+            services.AddSingleton<IAlunoRepository, AlunoRepository>();
+        }
 
         /// <summary>
         /// Configura as dependencias da camada de aplicação
@@ -45,6 +48,7 @@ namespace ApplicationLayer.Configuration
         private static void ConfigureServiceLayer(IServiceCollection services)
         {
             services.AddSingleton<IProfessorService, ProfessorService>();
+            services.AddSingleton<IAlunoService, AlunoService>();
         }
     }
 }

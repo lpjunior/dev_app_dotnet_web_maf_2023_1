@@ -13,6 +13,11 @@ namespace ServiceLayer
             _professores = new List<Professor>();
         }
 
+        /// <summary>
+        /// Método responsável por salvar os dados de um professor
+        /// </summary>
+        /// <param name="professor"></param>
+        /// <returns>professor</returns>
         public Professor RegistraProfessor(Professor professor)
         {
             // gero o ID

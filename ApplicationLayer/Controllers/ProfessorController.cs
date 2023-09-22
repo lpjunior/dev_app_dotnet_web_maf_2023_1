@@ -93,7 +93,7 @@ namespace ApplicationLayer.Controllers
         /// <returns>202, 400</returns>
         [HttpDelete()]
         [SwaggerOperation("apaga um professor pelo id")]
-        [SwaggerResponse(202)] // ok
+        [SwaggerResponse(202)] // aceito
         [SwaggerResponse(400)] // bad request
         public ActionResult Deleta(Guid id)
         {
