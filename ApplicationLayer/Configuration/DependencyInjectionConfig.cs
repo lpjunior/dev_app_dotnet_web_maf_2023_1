@@ -1,5 +1,8 @@
-﻿using DomainLayer.Interfaces.Repository;
+﻿
+
+using DomainLayer.Interfaces.Repository;
 using DomainLayer.Interfaces.Service;
+using InfrastructureLayer.Data.Repository;
 using ServiceLayer;
 
 namespace ApplicationLayer.Configuration
@@ -39,6 +42,7 @@ namespace ApplicationLayer.Configuration
         /// <param name="services"></param>
         private static void ConfigureInfrastructureLayer(IServiceCollection services) {
             services.AddSingleton<IAlunoRepository, AlunoRepository>();
+            services.AddSingleton<IProfessorRepository, ProfessorRepository>();
         }
 
         /// <summary>

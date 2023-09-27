@@ -37,7 +37,7 @@ namespace ApplicationLayer.Controllers
                 return BadRequest();
             }
 
-            _professorService.RegistraProfessor(professor);
+            _professorService.Registra(professor);
 
             return Created("", professor);
         }
@@ -53,7 +53,7 @@ namespace ApplicationLayer.Controllers
         [SwaggerResponse(400)] // bad request
         public ActionResult<IEnumerable<Professor>> Lista()
         {
-            var professores = _professorService.ListaProfessores();
+            var professores = _professorService.Lista();
 
             return Ok(professores);
         }
@@ -69,7 +69,7 @@ namespace ApplicationLayer.Controllers
         [SwaggerResponse(400)] // bad request
         public ActionResult<IEnumerable<Professor>> Busca(string nome)
         {
-            return Ok(_professorService.BuscaProfessor(nome));
+            return Ok(_professorService.Busca(nome));
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace ApplicationLayer.Controllers
         [SwaggerResponse(400)] // bad request
         public ActionResult<Professor> Atualiza(Professor professor)
         {
-            return Ok(_professorService.AtualizarProfessor(professor));
+            return Ok(_professorService.Atualiza(professor));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace ApplicationLayer.Controllers
         [SwaggerResponse(400)] // bad request
         public ActionResult Deleta(Guid id)
         {
-            _professorService.ApagaProfessor(id);
+            _professorService.Apaga(id);
             return Accepted();
         }
     }
