@@ -1,56 +1,51 @@
 ﻿using ApplicationLayer;
+using Dapper;
+using DomainLayer.Interfaces.Infrastructure;
 using DomainLayer.Interfaces.Repository;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace InfrastructureLayer.Data.Repository
 {
     public class AlunoRepository : IAlunoRepository
     {
-        private static List<Aluno> _alunos = default!;
+        private readonly IDbContext _context;
+        private readonly ILogger<AlunoRepository> _logger;
 
-        public AlunoRepository() => _alunos = new List<Aluno>();
-
-        public void Apaga(Guid id)
+        public AlunoRepository(ILogger<AlunoRepository> logger, IDbContext context)
         {
-            var alunoFinded = _alunos.Find(aluno => aluno.Id.ToString().Equals(id.ToString()))! ?? throw new Exception("Aluno não localizado");
-            _alunos.Remove(alunoFinded);
+            _logger = logger;
+            _context = context;
         }
-        
-        public Aluno Atualiza(Aluno aluno)
+
+        public async Task Registra(Aluno aluno)
         {
-            var alunoFinded = _alunos.Find(alu => alu.Id.ToString().Equals(aluno.Id.ToString()))!;
+            _logger.LogInformation($"[AlunoRepository]-[Registra] -> [Start]: Payload -> {JsonSerializer.Serialize(aluno)}");
 
-            var idx = _alunos.IndexOf(alunoFinded);
+            using var connection = _context.CreateConnection;
 
-            if (idx == -1) {
-                throw new Exception("Aluno não localizado");
+            var query = "INSERT INTO aluno(Nome, Matricula, DataNascimento) VALUES (@Nome, @Matricula, @DataNascimento);";
+
+            try
+            {
+                await connection.ExecuteAsync(query, aluno);
+            } catch (Exception exception) {
+                _logger.LogError($"[AlunoRepository]-[Registra] -> [Exception]: Message -> {exception.Message}");
+                _logger.LogError($"[AlunoRepository]-[Registra] -> [InnerException]: Message -> {exception.InnerException}");
+
             }
 
-            _alunos[idx].Nome = aluno.Nome;
-            _alunos[idx].DataNascimento = aluno.DataNascimento;
-            return _alunos[idx];
+            _logger.LogInformation("[AlunoRepository]-[Registra] -> [Finish]");
         }
 
-        public IEnumerable<Aluno> Busca(string nome)
-        {
-            return _alunos.FindAll(aluno => aluno.Nome.ToLower().Contains(nome.ToLower()));
-        }
+        public Task Apaga(Guid id) => throw new NotImplementedException();
 
-        public IEnumerable<int> BuscaNotas(int matricula)
-        {
-            throw new NotImplementedException();
-        }
+        public Task Atualiza(Aluno aluno) => throw new NotImplementedException();
 
-        public IEnumerable<Aluno> Lista()
-        {
-            return _alunos;
-        }
+        public Task<IEnumerable<Aluno>> Busca(string nome) => throw new NotImplementedException();
 
-        public Aluno Registra(Aluno aluno)
-        {
-            aluno.Id = Guid.NewGuid();
-            _alunos.Add(aluno);
+        public Task<IEnumerable<int>> BuscaNotas(int matricula) => throw new NotImplementedException();
 
-            return aluno;
-        }
+        public Task<IEnumerable<Aluno>> Lista() => throw new NotImplementedException();
     }
 }

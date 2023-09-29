@@ -10,20 +10,22 @@ namespace ServiceLayer
 
         public AlunoService(IAlunoRepository repository) => _repository = repository;
 
-        public void Apaga(Guid id) => _repository.Apaga(id);
+        public async Task Apaga(Guid id) => await _repository.Apaga(id);
 
-        public Aluno Atualiza(Aluno aluno) => _repository.Atualiza(aluno);
+        public async Task Atualiza(Aluno aluno) => await _repository.Atualiza(aluno);
 
-        public IEnumerable<Aluno> Busca(string nome) => _repository.Busca(nome);
+        public async Task<IEnumerable<Aluno>> Busca(string nome) => await _repository.Busca(nome);
 
-        public IEnumerable<Aluno> Lista() => _repository.Lista();
+        public Task<IEnumerable<int>> BuscaNotas(int matricula) => throw new NotImplementedException();
 
-        public Aluno Registra(Aluno aluno) => _repository.Registra(aluno);
+        public async Task<IEnumerable<Aluno>> Lista() => await _repository.Lista();
 
-        public string Situacao(int matricula)
+        public async Task Registra(Aluno aluno) => await _repository.Registra(aluno);
+
+        public async Task<string> SituacaoAsync(int matricula)
         {
             // busquei todas as notas do aluno cadastradas
-            var notas = _repository.BuscaNotas(matricula); // já me entrega a soma das notas
+            var notas = await _repository.BuscaNotas(matricula); // já me entrega a soma das notas
             
             // define a quantidade de exercicios propostos durante a UC
             var totalExercicios = 13;

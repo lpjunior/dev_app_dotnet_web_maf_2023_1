@@ -1,5 +1,6 @@
 ﻿
 
+using DomainLayer.Interfaces.Infrastructure;
 using DomainLayer.Interfaces.Repository;
 using DomainLayer.Interfaces.Service;
 using InfrastructureLayer.Data.Repository;
@@ -22,6 +23,8 @@ namespace ApplicationLayer.Configuration
             ConfigureDomainLayer(services);
             ConfigureInfrastructureLayer(services);
             ConfigureServiceLayer(services);
+
+            services.AddLogging();
         }
 
         /// <summary>
@@ -41,8 +44,11 @@ namespace ApplicationLayer.Configuration
         /// </summary>
         /// <param name="services"></param>
         private static void ConfigureInfrastructureLayer(IServiceCollection services) {
-            services.AddSingleton<IAlunoRepository, AlunoRepository>();
-            services.AddSingleton<IProfessorRepository, ProfessorRepository>();
+
+            services.AddScoped<IDbContext, DbContext>();
+            services.AddSingleton<ISqlServerConnectionProvider, SqlServerConnectionProvider>();
+            services.AddScoped<IAlunoRepository, AlunoRepository>();
+            services.AddScoped<IProfessorRepository, ProfessorRepository>();
         }
 
         /// <summary>
@@ -51,8 +57,8 @@ namespace ApplicationLayer.Configuration
         /// <param name="services"></param>
         private static void ConfigureServiceLayer(IServiceCollection services)
         {
-            services.AddSingleton<IProfessorService, ProfessorService>();
-            services.AddSingleton<IAlunoService, AlunoService>();
+            services.AddScoped<IProfessorService, ProfessorService>();
+            services.AddScoped<IAlunoService, AlunoService>();
         }
     }
 }

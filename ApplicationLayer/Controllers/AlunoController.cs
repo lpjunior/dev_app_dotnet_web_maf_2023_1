@@ -1,3 +1,4 @@
+using DomainLayer.Interfaces.Repository;
 using DomainLayer.Interfaces.Service;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -13,12 +14,14 @@ namespace ApplicationLayer.Controllers
     {
         private readonly ILogger<AlunoController> _logger;
         private readonly IAlunoService _alunoService;
+        private readonly ISqlServerConnectionProvider _sqlServerConnectionProvider;
 
         /// <inheritdoc />
-        public AlunoController(ILogger<AlunoController> logger, IAlunoService alunoService)
+        public AlunoController(ILogger<AlunoController> logger, IAlunoService alunoService, ISqlServerConnectionProvider sqlServerConnectionProvider)
         {
             _logger = logger;
             _alunoService = alunoService;
+            _sqlServerConnectionProvider = sqlServerConnectionProvider;
         }
 
         /// <summary>
@@ -44,11 +47,11 @@ namespace ApplicationLayer.Controllers
         [SwaggerOperation("Registra aluno")]
         [SwaggerResponse(201)]
         [SwaggerResponse(400)]
-        public ActionResult<Aluno> Registra([FromBody] Aluno aluno)
+        public async Task<ActionResult> RegistraAsync([FromBody] Aluno aluno)
         {
-            var alunos = _alunoService.Registra(aluno);
+            await _alunoService.Registra(aluno);
 
-            return Created("", alunos);
+            return Created("", "");
         }
 
         /// <summary>
@@ -59,9 +62,9 @@ namespace ApplicationLayer.Controllers
         [SwaggerOperation("Busca o(s) aluno(s)")]
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
-        public ActionResult<IEnumerable<Aluno>> Busca([FromRoute] string nome)
+        public async Task<ActionResult<IEnumerable<Aluno>>> BuscaAsync([FromRoute] string nome)
         {
-            var alunos = _alunoService.Lista();
+            var alunos = await _alunoService.Lista();
 
             return Ok(alunos);
         }
@@ -74,9 +77,9 @@ namespace ApplicationLayer.Controllers
         [SwaggerOperation("Atualiza aluno")]
         [SwaggerResponse(204)]
         [SwaggerResponse(400)]
-        public ActionResult<Aluno> Atualiza([FromBody] Aluno aluno)
+        public async Task<ActionResult> AtualizaAsync([FromBody] Aluno aluno)
         {
-            _ = _alunoService.Atualiza(aluno);
+            await _alunoService.Atualiza(aluno);
 
             return NoContent();
         }
@@ -89,9 +92,9 @@ namespace ApplicationLayer.Controllers
         [SwaggerOperation("Apaga aluno")]
         [SwaggerResponse(204)]
         [SwaggerResponse(400)]
-        public ActionResult<Aluno> Apaga([FromRoute] Guid id)
+        public async Task<ActionResult> ApagaAsync([FromRoute] Guid id)
         {
-            _alunoService.Apaga(id);
+            await _alunoService.Apaga(id);
 
             return NoContent();
         }
