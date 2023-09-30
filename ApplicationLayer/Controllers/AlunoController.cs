@@ -14,14 +14,12 @@ namespace ApplicationLayer.Controllers
     {
         private readonly ILogger<AlunoController> _logger;
         private readonly IAlunoService _alunoService;
-        private readonly ISqlServerConnectionProvider _sqlServerConnectionProvider;
 
         /// <inheritdoc />
-        public AlunoController(ILogger<AlunoController> logger, IAlunoService alunoService, ISqlServerConnectionProvider sqlServerConnectionProvider)
+        public AlunoController(ILogger<AlunoController> logger, IAlunoService alunoService)
         {
             _logger = logger;
             _alunoService = alunoService;
-            _sqlServerConnectionProvider = sqlServerConnectionProvider;
         }
 
         /// <summary>
