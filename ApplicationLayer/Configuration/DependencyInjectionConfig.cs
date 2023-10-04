@@ -1,5 +1,7 @@
 ﻿
 
+using System.ComponentModel;
+using Dapper;
 using DomainLayer.Interfaces.Infrastructure;
 using DomainLayer.Interfaces.Repository;
 using DomainLayer.Interfaces.Service;
@@ -45,10 +47,12 @@ namespace ApplicationLayer.Configuration
         /// <param name="services"></param>
         private static void ConfigureInfrastructureLayer(IServiceCollection services) {
 
-            services.AddScoped<IDbContext, DbContext>();
+            services.AddScoped<IDbContext, AppDbContext>();
             services.AddSingleton<ISqlServerConnectionProvider, SqlServerConnectionProvider>();
             services.AddScoped<IAlunoRepository, AlunoRepository>();
             services.AddScoped<IProfessorRepository, ProfessorRepository>();
+            SqlMapper.AddTypeHandler(new DateOnlyHandler());
+            SqlMapper.AddTypeHandler(new TimeOnlyHandler());
         }
 
         /// <summary>

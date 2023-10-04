@@ -29,10 +29,14 @@ public int Matricula { get; set; }
 public string Nome { get; set; } = string.Empty;
 public IEnumerable<string> Conhecimentos { get; set; } = default!;
 */
-CREATE TABLE Professor(
+/*CREATE TABLE Professor(
 
-);
+);*/
 
 
 
-select * from aluno
+select * from aluno;
+
+select CURRENT_TIMESTAMP; -- Datetime
+SELECT CONVERT (date, CURRENT_TIMESTAMP); -- DateOnly
+SELECT CONVERT (time, CURRENT_TIMESTAMP); -- TimeOnly

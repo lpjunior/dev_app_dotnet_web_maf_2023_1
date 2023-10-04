@@ -4,11 +4,11 @@ using System.Data;
 
 namespace InfrastructureLayer.Data.Repository
 {
-    public class DbContext : IDbContext
+    public class AppDbContext : IDbContext
     {
         private readonly ISqlServerConnectionProvider _sqlServerConnectionProvider;
 
-        public DbContext(ISqlServerConnectionProvider sqlServerConnectionProvider) {
+        public AppDbContext(ISqlServerConnectionProvider sqlServerConnectionProvider) {
             _sqlServerConnectionProvider = sqlServerConnectionProvider;
         }
 

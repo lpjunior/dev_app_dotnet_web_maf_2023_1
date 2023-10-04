@@ -30,9 +30,9 @@ namespace ApplicationLayer.Controllers
         [SwaggerOperation("Lista os alunos")]
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
-        public ActionResult<IEnumerable<Aluno>> Lista()
+        public async Task<ActionResult<IEnumerable<Aluno>>> ListaAsync()
         {
-            var alunos = _alunoService.Lista();
+            var alunos = await _alunoService.Lista();
 
             return Ok(alunos);
         }
@@ -62,7 +62,7 @@ namespace ApplicationLayer.Controllers
         [SwaggerResponse(400)]
         public async Task<ActionResult<IEnumerable<Aluno>>> BuscaAsync([FromRoute] string nome)
         {
-            var alunos = await _alunoService.Lista();
+            var alunos = await _alunoService.Busca(nome);
 
             return Ok(alunos);
         }
@@ -86,7 +86,7 @@ namespace ApplicationLayer.Controllers
         /// Método responsável por apaga um aluno no sistema
         /// </summary>
         /// <returns>204, 400</returns>
-        [HttpDelete()]
+        [HttpDelete("{id}")]
         [SwaggerOperation("Apaga aluno")]
         [SwaggerResponse(204)]
         [SwaggerResponse(400)]

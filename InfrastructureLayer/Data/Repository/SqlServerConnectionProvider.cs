@@ -1,5 +1,4 @@
 ﻿using DomainLayer.Interfaces.Repository;
-using DomainLayer.Models.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
@@ -22,27 +21,9 @@ namespace InfrastructureLayer.Data.Repository
 
         private string BuilderConnectionString()
         {
-            var builder = new SqlConnectionStringBuilder();
-            var dataSource = SetDataSource();
-
-            builder.UserID = dataSource.UserId;
-            builder.Password = dataSource.Password;
-            builder.DataSource = dataSource.DataSource;
-            builder.InitialCatalog = dataSource.InitialCatalog;
-            builder.ConnectTimeout = dataSource.ConnectTimeout;
-            builder.MaxPoolSize = dataSource.MaxPoolSize;
-            builder.Pooling = dataSource.Pooling;
-            builder.TrustServerCertificate = dataSource.TrustServerCertificate;
-            builder.PersistSecurityInfo = dataSource.PersistSecurityInfo;
-            builder.Encrypt = dataSource.Encrypt;
-            return builder.ConnectionString;
-        }
-
-        private SqlServerDataSource SetDataSource()
-        {
-            return new SqlServerDataSource
+            var builder = new SqlConnectionStringBuilder
             {
-                UserId = _configuration.GetValue<string>("SqlServerSettings:User")!,
+                UserID = _configuration.GetValue<string>("SqlServerSettings:User")!,
                 Password = _configuration.GetValue<string>("SqlServerSettings:Password")!,
                 DataSource = _configuration.GetValue<string>("SqlServerSettings:DataSource")!,
                 InitialCatalog = _configuration.GetValue<string>("SqlServerSettings:InitialCatalog")!,
@@ -51,9 +32,9 @@ namespace InfrastructureLayer.Data.Repository
                 Pooling = _configuration.GetValue<bool>("SqlServerSettings:Pooling")!,
                 TrustServerCertificate = _configuration.GetValue<bool>("SqlServerSettings:TrustServerCertificate")!,
                 PersistSecurityInfo = _configuration.GetValue<bool>("SqlServerSettings:PersistSecurityInfo")!,
-                Encrypt = _configuration.GetValue<bool>("SqlServerSettings:Encrypt")!,
-                CommandTimeout = _configuration.GetValue<int>("SqlServerSettings:CommandTimeout")!
+                Encrypt = _configuration.GetValue<bool>("SqlServerSettings:Encrypt")!
             };
+            return builder.ConnectionString;
         }
     }
 }

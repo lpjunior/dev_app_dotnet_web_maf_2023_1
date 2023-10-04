@@ -1,10 +1,10 @@
 
 # Senac Rio - Cadastrado Professores e Alunos
 
-Repositório para a turma de desenvolvimento .net de aplicações back-end para Web - MAF - 2023.1
+RepositÃ³rio para a turma de desenvolvimento .net de aplicaÃ§Ãµes back-end para Web - MAF - 2023.1
 
 
-## Documentação da API
+## DocumentaÃ§Ã£o da API
 
 #### Retorna todos os itens
 
@@ -27,9 +27,9 @@ Repositório para a turma de desenvolvimento .net de aplicações back-end para Web
   GET /api/professor/busca?nome={nome}
 ```
 
-| Parâmetro   | Tipo       | Descrição                                   |
+| ParÃ¢metro   | Tipo       | DescriÃ§Ã£o                                   |
 | :---------- | :--------- | :------------------------------------------ |
-| `nome`      | `string` | **Obrigatório**. O NOME do professor que você quer |
+| `nome`      | `string` | **ObrigatÃ³rio**. O NOME do professor que vocÃª quer |
 
 
 ## Autores
@@ -37,7 +37,7 @@ Repositório para a turma de desenvolvimento .net de aplicações back-end para Web
 - [@lpjunior](https://www.github.com/lpjunior)
 
 
-## Referência
+## ReferÃªncia
 
  - [.Net](https://learn.microsoft.com/pt-br/dotnet/)
  - [What is REST](https://restfulapi.net)
