@@ -1,6 +1,8 @@
 ﻿using ApplicationLayer;
 using DomainLayer.Interfaces.Repository;
 using DomainLayer.Interfaces.Service;
+using DomainLayer.Models.Constants;
+using DomainLayer.ViewModels;
 
 namespace ServiceLayer
 {
@@ -16,27 +18,34 @@ namespace ServiceLayer
 
         public async Task<IEnumerable<Aluno>> Busca(string nome) => await _repository.Busca(nome);
 
-        public Task<IEnumerable<int>> BuscaNotas(int matricula) => throw new NotImplementedException();
+        public async Task RegistraNotas(AlunoNotasViewModel viewModel) => await _repository.RegistraNotas(viewModel);
+
+        public async Task<AlunoNotasViewModel> BuscaNotas(string matricula) => await _repository.BuscaNotas(matricula);
 
         public async Task<IEnumerable<Aluno>> Lista() => await _repository.Lista();
 
-        public async Task Registra(Aluno aluno) => await _repository.Registra(aluno);
+        public async Task<dynamic> BuscaAlunoNotas(string matricula) => await _repository.BuscaAlunoNotas(matricula);
 
-        public async Task<string> SituacaoAsync(int matricula)
+        public async Task Registra(AlunoCadastroViewModel viewModel) => await _repository.Registra(viewModel);
+
+        public async Task<string> SituacaoAsync(string matricula)
         {
             // busquei todas as notas do aluno cadastradas
-            var notas = await _repository.BuscaNotas(matricula); // já me entrega a soma das notas
+            var notasAluno = await _repository.BuscaNotas(matricula)!; // já me entrega a soma das notas
             
             // define a quantidade de exercicios propostos durante a UC
             var totalExercicios = 13;
 
-            var somaNotas = notas.Sum(nota => nota);
+            var somaNotas = notasAluno.Notas.Sum(nota => nota);
 
             var media = somaNotas / totalExercicios;
 
-            if(media < 4) { return "repovado"; }
-            else if (media < 7) { return "recuperação"; }
-            else { return "aprovado"; }
+            return media switch
+            {
+                < 4 => StrConstants.Reprovado,
+                < 7 => StrConstants.Recuperacao,
+                _ => StrConstants.Aprovado
+            };
         }
     }
 }

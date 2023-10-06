@@ -2,7 +2,10 @@
 using Dapper;
 using DomainLayer.Interfaces.Infrastructure;
 using DomainLayer.Interfaces.Repository;
+using DomainLayer.Models;
+using DomainLayer.ViewModels;
 using Microsoft.Extensions.Logging;
+using System.Text;
 using System.Text.Json;
 
 namespace InfrastructureLayer.Data.Repository
@@ -18,18 +21,18 @@ namespace InfrastructureLayer.Data.Repository
             _context = context;
         }
 
-        public async Task Registra(Aluno aluno)
+        public async Task Registra(AlunoCadastroViewModel viewModel)
         {
-            _logger.LogInformation($"[AlunoRepository]-[Registra] -> [Start]: Payload -> {JsonSerializer.Serialize(aluno)}");
+            _logger.LogInformation($"[AlunoRepository]-[Registra] -> [Start]: Payload -> {JsonSerializer.Serialize(viewModel)}");
 
             using var connection = _context.CreateConnection;
 
             const string query = "INSERT INTO aluno(Nome, Matricula, DataNascimento) VALUES (@Nome, @Matricula, @DataNascimento);";
             var parameters = new
             {
-                aluno.Nome,
-                aluno.Matricula,
-                DataNascimento = aluno.DataNascimento.ToString("yyyy-MM-dd")
+                viewModel.Nome,
+                viewModel.Matricula,
+                DataNascimento = viewModel.DataNascimento.ToString("yyyy-MM-dd")
             };
             
             try
@@ -43,6 +46,7 @@ namespace InfrastructureLayer.Data.Repository
 
             _logger.LogInformation("[AlunoRepository]-[Registra] -> [Finish]");
         }
+
         public async Task<IEnumerable<Aluno>> Lista()
         {
             _logger.LogInformation($"[AlunoRepository]-[Lista] -> [Start]");
@@ -146,6 +150,118 @@ namespace InfrastructureLayer.Data.Repository
             }
         }
 
-        public async Task<IEnumerable<int>> BuscaNotas(int matricula) => throw new NotImplementedException();
+        public async Task RegistraNotas(AlunoNotasViewModel viewModel)
+        {
+            _logger.LogInformation($"[AlunoRepository]-[RegistraNotas] -> [Start]: Payload -> {JsonSerializer.Serialize(viewModel)}");
+
+            using var connection = _context.CreateConnection;
+
+            var query = new StringBuilder("INSERT INTO NotaAluno(AlunoId, Nota) VALUES ");
+            var parameters = new DynamicParameters();
+            var paramIndex = 0;
+
+            foreach(var nota in viewModel.Notas)
+            {
+                query.Append($"(@AlunoId{paramIndex}, @Nota{paramIndex}), ");
+                parameters.Add($"AlunoId{paramIndex}", viewModel.AlunoId);
+                parameters.Add($"Nota{paramIndex}", nota);
+                paramIndex++;
+            }
+
+            query.Length -= 2;
+
+            try
+            {
+                await connection.ExecuteAsync(query.ToString(), parameters);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError($"[AlunoRepository]-[RegistraNotas] -> [Exception]: Message -> {exception.Message}");
+                _logger.LogError($"[AlunoRepository]-[RegistraNotas] -> [InnerException]: Message -> {exception.InnerException}");
+                throw;
+            }
+
+            _logger.LogInformation("[AlunoRepository]-[RegistraNotas] -> [Finish]");
+        }
+
+        public async Task<AlunoNotasViewModel> BuscaNotas(string matricula)
+        {
+            _logger.LogInformation($"[AlunoRepository]-[BuscaNotas] -> [Start]: Matricula -> {matricula}");
+
+            using var connection = _context.CreateConnection;
+
+            const string query = "SELECT * FROM NotaAluno WHERE AlunoId = (SELECT Id FROM aluno WHERE Matricula = @Matricula)";
+
+            var param = new
+            {
+                Matricula = matricula
+            };
+
+            try
+            {
+                var result = await connection.QueryAsync<NotaAluno>(query, param);
+
+                if(!result.Any())
+                {
+                    _logger.LogWarning("[AlunoRepository]-[BuscaNotas] -> [NotFound]: Nenhuma nota encontrada");
+                    return new AlunoNotasViewModel
+                    {
+                        Notas = new List<double> { 0 }
+                    };
+                }
+
+                var viewModel = new AlunoNotasViewModel
+                {
+                    AlunoId = result.FirstOrDefault()!.AlunoId,
+                    Notas = result.Select(nota => nota.Nota)
+                };
+
+                _logger.LogInformation("[AlunoRepository]-[BuscaNotas] -> [Finish]");
+                return viewModel;
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError($"[AlunoRepository]-[BuscaNotas] -> [Exception]: Message -> {exception.Message}");
+                _logger.LogError($"[AlunoRepository]-[BuscaNotas] -> [InnerException]: Message -> {exception.InnerException}");
+                throw;
+            }
+        }
+
+        public async Task<dynamic> BuscaAlunoNotas(string matricula)
+        {
+            _logger.LogInformation($"[AlunoRepository]-[BuscaAlunoNotas] -> [Start]: Matricula -> {matricula}");
+
+            using var connection = _context.CreateConnection;
+
+            const string query = "SELECT * FROM view_aluno_notas WHERE Matricula = @Matricula";
+
+            var param = new
+            {
+                Matricula = matricula
+            };
+
+            try
+            {
+                var result = await connection.QueryAsync<AlunoNotaBuscaViewModel>(query, param);
+
+
+                var viewModel = new
+                {
+                    result.FirstOrDefault()!.Nome,
+                    result.FirstOrDefault()!.Matricula,
+                    result.FirstOrDefault()!.DataNascimento,
+                    Notas = result.Select(nota => nota.Nota)
+                };
+
+                _logger.LogInformation("[AlunoRepository]-[BuscaAlunoNotas] -> [Finish]");
+                return viewModel;
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError($"[AlunoRepository]-[BuscaAlunoNotas] -> [Exception]: Message -> {exception.Message}");
+                _logger.LogError($"[AlunoRepository]-[BuscaAlunoNotas] -> [InnerException]: Message -> {exception.InnerException}");
+                throw;
+            }
+        }
     }
 }

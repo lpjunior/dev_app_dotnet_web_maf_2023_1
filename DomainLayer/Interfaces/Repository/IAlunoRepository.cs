@@ -1,14 +1,17 @@
 ﻿using ApplicationLayer;
+using DomainLayer.ViewModels;
 
 namespace DomainLayer.Interfaces.Repository
 {
     public interface IAlunoRepository
     {
-        Task Registra(Aluno aluno);
+        Task Registra(AlunoCadastroViewModel viewModel);
         Task<IEnumerable<Aluno>> Lista();
         Task<IEnumerable<Aluno>> Busca(string nome);
         Task Atualiza(Aluno aluno);
         Task Apaga(Guid id);
-        Task<IEnumerable<int>> BuscaNotas(int matricula);
+        Task RegistraNotas(AlunoNotasViewModel viewModel);
+        Task<AlunoNotasViewModel> BuscaNotas(string matricula);
+        Task<dynamic> BuscaAlunoNotas(string matricula);
     }
 }

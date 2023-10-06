@@ -1,5 +1,6 @@
 using DomainLayer.Interfaces.Repository;
 using DomainLayer.Interfaces.Service;
+using DomainLayer.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -45,9 +46,9 @@ namespace ApplicationLayer.Controllers
         [SwaggerOperation("Registra aluno")]
         [SwaggerResponse(201)]
         [SwaggerResponse(400)]
-        public async Task<ActionResult> RegistraAsync([FromBody] Aluno aluno)
+        public async Task<ActionResult> RegistraAsync([FromBody] AlunoCadastroViewModel viewModel)
         {
-            await _alunoService.Registra(aluno);
+            await _alunoService.Registra(viewModel);
 
             return Created("", "");
         }
@@ -65,6 +66,21 @@ namespace ApplicationLayer.Controllers
             var alunos = await _alunoService.Busca(nome);
 
             return Ok(alunos);
+        }
+
+        /// <summary>
+        /// Método responsável por buscar todos os dados de aluno pela matricula
+        /// </summary>
+        /// <returns>200, 400</returns>
+        [HttpGet("find/{matricula}")]
+        [SwaggerOperation("Busca os dados de aluno pela matricula")]
+        [SwaggerResponse(200)]
+        [SwaggerResponse(400)]
+        public async Task<ActionResult<IEnumerable<Aluno>>> BuscaAlunoNotas([FromRoute] string matricula)
+        {
+            var alunoNotas = await _alunoService.BuscaAlunoNotas(matricula);
+
+            return Ok(alunoNotas);
         }
 
         /// <summary>
