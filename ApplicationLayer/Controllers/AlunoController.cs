@@ -76,7 +76,7 @@ namespace ApplicationLayer.Controllers
         [SwaggerOperation("Busca os dados de aluno pela matricula")]
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
-        public async Task<ActionResult<IEnumerable<Aluno>>> BuscaAlunoNotas([FromRoute] string matricula)
+        public async Task<ActionResult<IEnumerable<dynamic>>> BuscaAlunoNotas([FromRoute] string matricula)
         {
             var alunoNotas = await _alunoService.BuscaAlunoNotas(matricula);
 

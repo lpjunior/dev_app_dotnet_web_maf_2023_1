@@ -244,7 +244,6 @@ namespace InfrastructureLayer.Data.Repository
             {
                 var result = await connection.QueryAsync<AlunoNotaBuscaViewModel>(query, param);
 
-
                 var viewModel = new
                 {
                     result.FirstOrDefault()!.Nome,

@@ -1,7 +1,7 @@
 ﻿using ApplicationLayer;
 using DomainLayer.Interfaces.Repository;
 using DomainLayer.Interfaces.Service;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using DomainLayer.ViewModels;
 
 namespace ServiceLayer
 {
@@ -16,9 +16,9 @@ namespace ServiceLayer
         /// </summary>
         /// <param name="professor"></param>
         /// <returns>professor</returns>
-        public Professor Registra(Professor professor) => _repository.Registra(professor);
+        public async Task Registra(ProfessorCadastroViewModel viewModel) => await _repository.Registra(viewModel);
 
-        public IEnumerable<Professor> Lista() => _repository.Lista();
+        public async Task<IEnumerable<Professor>> Lista() => await _repository.Lista();
 
         public IEnumerable<Professor> Busca(string nome) => _repository.Busca(nome);
 

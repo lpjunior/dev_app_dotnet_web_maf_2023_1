@@ -1,4 +1,5 @@
 ﻿using DomainLayer.Interfaces.Service;
+using DomainLayer.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -24,22 +25,30 @@ namespace ApplicationLayer.Controllers
         /// <summary>
         /// Método responsável por cadastrar um professor
         /// </summary>
-        /// <param name="professor"></param>
+        /// <param name="viewModel"></param>
         /// <returns>201, 400</returns>
         [HttpPost]
         [SwaggerOperation("Cadastra um novo professor")]
         [SwaggerResponse(201)] // create
         [SwaggerResponse(400)] // bad request
-        public ActionResult<Professor> Register([FromBody] Professor professor)
+        public async Task<ActionResult> RegisterAsync([FromBody] ProfessorCadastroViewModel viewModel)
         {
-            if (professor.Conhecimentos.Count() <= 0)
+            if (!viewModel.Conhecimentos.Any())
             {
                 return BadRequest();
             }
 
-            _professorService.Registra(professor);
+            try
+            {
+                await _professorService.Registra(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[ProfessorController]-[RegisterAsync] -> [Exception]: Message -> {ex.Message}");
+                return BadRequest();
+            }
 
-            return Created("", professor);
+            return Created("", "");
         }
 
 
@@ -51,9 +60,9 @@ namespace ApplicationLayer.Controllers
         [SwaggerOperation("Lista os prefessores")]
         [SwaggerResponse(200)] // ok
         [SwaggerResponse(400)] // bad request
-        public ActionResult<IEnumerable<Professor>> Lista()
+        public async Task<ActionResult<IEnumerable<Professor>>> ListaAsync()
         {
-            var professores = _professorService.Lista();
+            var professores = await _professorService.Lista();
 
             return Ok(professores);
         }

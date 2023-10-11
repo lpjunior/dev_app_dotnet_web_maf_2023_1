@@ -1,7 +1,4 @@
-﻿
-
-using System.ComponentModel;
-using Dapper;
+﻿using Dapper;
 using DomainLayer.Interfaces.Infrastructure;
 using DomainLayer.Interfaces.Repository;
 using DomainLayer.Interfaces.Service;
