@@ -49,9 +49,9 @@ namespace BibliotecaApp.Controllers.API
         // PUT: api/Livros/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLivro([FromRoute] int id, [FromBody] Livro livro)
+        public async Task<IActionResult> PutLivro([FromRoute] Guid id, [FromBody] Livro livro)
         {
-            if (id != livro.Id)
+            if (id.ToString().Equals(livro.Id.ToString()))
             {
                 return BadRequest();
             }
@@ -111,9 +111,9 @@ namespace BibliotecaApp.Controllers.API
             return NoContent();
         }
 
-        private bool LivroExists(int id)
+        private bool LivroExists(Guid id)
         {
-            return (_context.Livro?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Livro?.Any(e => e.Id.ToString().Equals(id.ToString()))).GetValueOrDefault();
         }
     }
 }

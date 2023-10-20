@@ -8,7 +8,7 @@ namespace BibliotecaApp.Data
     {
         private readonly IConfiguration _configuration;
 
-        public BibliotecaAppContext(IConfiguration configuration)
+        public BibliotecaAppContext(DbContextOptions<BibliotecaAppContext> options, IConfiguration configuration) : base(options)
         {
             _configuration = configuration;
         }
