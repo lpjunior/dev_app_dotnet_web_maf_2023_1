@@ -1,11 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using BibliotecaApp.Data;
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+});
+builder.Services.AddCors(options => options.AddPolicy(
+    "CorsPolicies", builder => builder
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+        .SetIsOriginAllowed(_ => true)
+));
 builder.Services.AddDbContext<BibliotecaAppContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BibliotecaAppContext") ?? throw new InvalidOperationException("Connection string 'BibliotecaAppContext' not found.")));
 
@@ -35,5 +47,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapRazorPages();
+
+app.UseCors("CorsPolicies");
 
 app.Run();

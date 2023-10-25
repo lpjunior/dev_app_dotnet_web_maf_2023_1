@@ -1,7 +1,8 @@
-﻿@model BibliotecaApp.Models.Livro
+@model BibliotecaApp.Models.Livro
 
 @{
     ViewData["Title"] = "Edit";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 <h1>Edit</h1>
@@ -10,7 +11,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form id="edit" asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -51,4 +52,24 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function () {
+    
+            $("#edit").submit(function (e) {
+    
+                e.preventDefault();
+                e.stopPropagation();
+    
+                $.ajax({
+                    type: "PUT",
+                    url: "/Livros/Edit/@Model.Id",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        window.location.href = response.redirectToUrl;
+                    }
+                });
+            });
+        });
+    </script>
 }

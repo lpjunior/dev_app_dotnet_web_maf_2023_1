@@ -1,7 +1,8 @@
-﻿@model BibliotecaApp.Models.Livro
+@model BibliotecaApp.Models.Livro
 
 @{
     ViewData["Title"] = "Delete";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 <h1>Delete</h1>
@@ -43,9 +44,37 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+    <form id="delete">
+        @Html.AntiForgeryToken()
+        <button type="submit" id="submit" class="btn btn-danger">Delete</button> |
         <a asp-action="Index">Back to List</a>
     </form>
+        
+@section scripts
+{
+    <script>
+    $(document).ready(function() {
+        console.log("Script carregado!"); // Isto deve aparecer no console do seu navegador quando a página for carregada.
+
+        $("#delete").submit(function (e) {
+            console.log("Evento de submissão interceptado!"); // Isto deve aparecer quando você tentar enviar o formulário.
+
+            e.preventDefault();
+            e.stopPropagation();
+    
+            $.ajax({
+                type: "DELETE",
+                url: "/Livros/Delete/@Model.Id",
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    window.location.href = response.redirectToUrl;
+                }
+            });
+        });
+    });
+    </script>
+}
+
 </div>

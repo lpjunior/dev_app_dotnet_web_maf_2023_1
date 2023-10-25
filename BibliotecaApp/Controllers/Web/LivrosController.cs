@@ -56,16 +56,13 @@ namespace BibliotecaApp.Controllers.Web
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Titulo,Autor,AnoPublicacao,ISBN,QuantidadeDisponivel")] Livro livro)
+        public async Task<IActionResult> Create([Bind("Titulo,Autor,AnoPublicacao,ISBN,QuantidadeDisponivel")] Livro livro)
         {
-            if (ModelState.IsValid)
-            {
-                livro.Id = Guid.NewGuid();
-                _context.Add(livro);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(livro);
+            if (!ModelState.IsValid) return View(livro);
+            livro.Id = Guid.NewGuid();
+            _context.Add(livro);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Livros/Edit/5
@@ -115,7 +112,7 @@ namespace BibliotecaApp.Controllers.Web
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true, redirectToUrl = Url.Action("Index", "Livros") });
             }
             return View(livro);
         }
@@ -140,7 +137,7 @@ namespace BibliotecaApp.Controllers.Web
         }
 
         // DELETE: Livros/Delete/5
-        [HttpDelete, ActionName("Delete")]
+        [HttpDelete("Delete/{id:guid}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
@@ -155,7 +152,7 @@ namespace BibliotecaApp.Controllers.Web
             }
             
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true, redirectToUrl = Url.Action("Index", "Livros") });
         }
 
         private bool LivroExists(Guid id)
