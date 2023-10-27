@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using BibliotecaApp.Data;
 using BibliotecaApp.Models;
+using BibliotecaApp.Util;
 
 namespace BibliotecaApp.Controllers.Web
 {
@@ -59,6 +60,14 @@ namespace BibliotecaApp.Controllers.Web
         public async Task<IActionResult> Create([Bind("Titulo,Autor,AnoPublicacao,ISBN,QuantidadeDisponivel")] Livro livro)
         {
             if (!ModelState.IsValid) return View(livro);
+
+            // lançam exceptions
+            livro.Titulo.ValidarTitulo();
+            livro.Autor.ValidarAutor();
+            livro.AnoPublicacao.ValidarAnoPublicacao();
+            livro.QuantidadeDisponivel.ValidarQuantidadeDisponivel();
+            livro.ISBN.ValidarISBN();
+
             livro.Id = Guid.NewGuid();
             _context.Add(livro);
             await _context.SaveChangesAsync();
@@ -96,6 +105,12 @@ namespace BibliotecaApp.Controllers.Web
 
             if (ModelState.IsValid)
             {
+                livro.Titulo.ValidarTitulo();
+                livro.Autor.ValidarAutor();
+                livro.AnoPublicacao.ValidarAnoPublicacao();
+                livro.QuantidadeDisponivel.ValidarQuantidadeDisponivel();
+                livro.ISBN.ValidarISBN();
+
                 try
                 {
                     _context.Update(livro);

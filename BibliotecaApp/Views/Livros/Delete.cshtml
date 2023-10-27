@@ -54,11 +54,7 @@
 {
     <script>
     $(document).ready(function() {
-        console.log("Script carregado!"); // Isto deve aparecer no console do seu navegador quando a página for carregada.
-
         $("#delete").submit(function (e) {
-            console.log("Evento de submissão interceptado!"); // Isto deve aparecer quando você tentar enviar o formulário.
-
             e.preventDefault();
             e.stopPropagation();
     
