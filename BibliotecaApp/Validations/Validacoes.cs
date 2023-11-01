@@ -1,75 +1,85 @@
-﻿namespace BibliotecaApp.Util
+﻿namespace BibliotecaApp.Validations
 {
     public static class Validacoes
     {
-        public static void ValidarTitulo(this string titulo) {
+        public static string ValidarTitulo(this string titulo) {
             var tituloTrim = titulo.Trim();
 
             if (string.IsNullOrWhiteSpace(tituloTrim))
             {
-                throw new ArgumentException("O título é obrigatório.");
+                return "O título é obrigatório.";
             }
 
-            if(tituloTrim.Length < 3 || tituloTrim.Length > 255) {
-                throw new ArgumentException("O título deve ter entre 3 e 255 caracteres.");
+            if (tituloTrim.Length < 3 || tituloTrim.Length > 255) {
+                return "O título deve ter entre 3 e 255 caracteres.";
             }
+
+            return string.Empty;
         }
 
-        public static void ValidarAutor(this string autor) {
+        public static string ValidarAutor(this string autor) {
             var autorTrim = autor.Trim();
 
             if (string.IsNullOrWhiteSpace(autorTrim))
             {
-                throw new ArgumentException("O autor é obrigatório.");
+                return "O autor é obrigatório.";
             }
 
             if (autorTrim.Length < 3 || autorTrim.Length > 100)
             {
-                throw new ArgumentException("O autor deve ter entre 3 e 100 caracteres.");
+                return "O autor deve ter entre 3 e 100 caracteres.";
             }
+
+            return string.Empty;
         }
 
-        public static void ValidarAnoPublicacao(this int anoPublicacao) {
+        public static string ValidarAnoPublicacao(this int anoPublicacao) {
             if (anoPublicacao < 1700 || anoPublicacao > DateTime.Now.Year)
             {
-                throw new ArgumentException("O ano de publicação deve ter entre 1700 e o ano atual.");
+                return "O ano de publicação deve ter entre 1700 e o ano atual.";
             }
+
+            return string.Empty;
         }
 
-        public static void ValidarQuantidadeDisponivel(this int quantidadeDisponivel)
+        public static string ValidarQuantidadeDisponivel(this int quantidadeDisponivel)
         {
             if (quantidadeDisponivel < 0 || quantidadeDisponivel > 5)
             {
-                throw new ArgumentException("A quantidade disponível deve ser entre 0 e 5 livros.");
+                return "A quantidade disponível deve ser entre 0 e 5 livros.";
             }
+
+            return string.Empty;
         }
 
-        public static void ValidarISBN(this string isbn)
+        public static string ValidarISBN(this string isbn)
         {
             isbn = isbn.Trim().Replace("-", "");
 
             if (string.IsNullOrWhiteSpace(isbn))
             {
-                throw new ArgumentException("O ISBN é obrigatório.");
+                return "O ISBN é obrigatório.";
             }
 
             if (isbn.Length == 10)
             {
-                if(!ValidaISBN10(isbn))
-                    throw new ArgumentException("O ISBN-10 não segue o padrão internacional.");
+                if(!IsValidISBN10(isbn))
+                    return "O ISBN-10 não segue o padrão internacional.";
             }
             else if (isbn.Length == 13)
             {
-                if (!ValidaISBN13(isbn))
-                    throw new ArgumentException("O ISBN-13 não segue o padrão internacional.");
+                if (!IsValidISBN13(isbn))
+                    return "O ISBN-13 não segue o padrão internacional.";
             }
             else
             {
-                throw new ArgumentException("O ISBN deve seguir o padrão internacional de 10 ou 13 dígitos.");
+                return "O ISBN deve seguir o padrão internacional de 10 ou 13 dígitos.";
             }
+
+            return string.Empty;
         }
 
-        private static bool ValidaISBN10(string isbn)
+        private static bool IsValidISBN10(string isbn)
         {
             if (!isbn.All(char.IsDigit))
             {
@@ -88,7 +98,7 @@
             return isbn[9] == verificaDigito;
         }
 
-        private static bool ValidaISBN13(string isbn)
+        private static bool IsValidISBN13(string isbn)
         {
             if (!isbn.All(char.IsDigit))
             {

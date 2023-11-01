@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using BibliotecaApp.Data;
 using BibliotecaApp.Models;
-using BibliotecaApp.Util;
+using BibliotecaApp.Validations;
+using Microsoft.IdentityModel.Tokens;
+using BibliotecaApp.Extensions;
 
 namespace BibliotecaApp.Controllers.Web
 {
@@ -20,6 +22,16 @@ namespace BibliotecaApp.Controllers.Web
         // GET: Livros
         [HttpGet]
         public async Task<IActionResult> Index()
+        {
+            return _context.Livro != null ?
+                        View(await _context.Livro.ToListAsync()) :
+                        Problem("Entity set 'BibliotecaAppContext.Livro'  is null.");
+        }
+
+
+        // GET: Livros
+        [HttpGet("List")]
+        public async Task<IActionResult> List()
         {
             return _context.Livro != null ?
                         View(await _context.Livro.ToListAsync()) :
@@ -57,21 +69,31 @@ namespace BibliotecaApp.Controllers.Web
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Titulo,Autor,AnoPublicacao,ISBN,QuantidadeDisponivel")] Livro livro)
+        public async Task<IActionResult> Create([Bind("Titulo,Autor,AnoPublicacao,ISBN,QuantidadeDisponivel,CapaUrl")] Livro livro)
         {
             if (!ModelState.IsValid) return View(livro);
 
-            // lançam exceptions
-            livro.Titulo.ValidarTitulo();
-            livro.Autor.ValidarAutor();
-            livro.AnoPublicacao.ValidarAnoPublicacao();
-            livro.QuantidadeDisponivel.ValidarQuantidadeDisponivel();
-            livro.ISBN.ValidarISBN();
+            ModelState.AddModelErrorIfNotEmpty("Titulo", livro.Titulo.ValidarTitulo());
+            ModelState.AddModelErrorIfNotEmpty("Autor", livro.Autor.ValidarAutor());
+            ModelState.AddModelErrorIfNotEmpty("AnoPublicacao", livro.AnoPublicacao.ValidarAnoPublicacao());
+            ModelState.AddModelErrorIfNotEmpty("QuantidadeDisponivel", livro.QuantidadeDisponivel.ValidarQuantidadeDisponivel());
+            ModelState.AddModelErrorIfNotEmpty("ISBN", livro.ISBN.ValidarISBN());
 
-            livro.Id = Guid.NewGuid();
-            _context.Add(livro);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            var livroExistente = await _context.Livro.FirstOrDefaultAsync(l => l.ISBN == livro.ISBN);
+            if(livroExistente != null)
+            {
+                ModelState.AddModelErrorIfNotEmpty("ISBN", "ISBN já registrado");
+            }
+
+            if (ModelState.IsValid)
+            { 
+                livro.Id = Guid.NewGuid();
+                _context.Add(livro);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(livro);
         }
 
         // GET: Livros/Edit/5
@@ -96,21 +118,23 @@ namespace BibliotecaApp.Controllers.Web
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPut("Edit/{id:guid}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Titulo,Autor,AnoPublicacao,ISBN,QuantidadeDisponivel")] Livro livro)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Titulo,Autor,AnoPublicacao,ISBN,QuantidadeDisponivel,CapaUrl")] Livro livro)
         {
             if (id != livro.Id)
             {
                 return NotFound();
             }
 
+            if (!ModelState.IsValid) return View(livro);
+
+            ModelState.AddModelErrorIfNotEmpty("Titulo", livro.Titulo.ValidarTitulo());
+            ModelState.AddModelErrorIfNotEmpty("Autor", livro.Autor.ValidarAutor());
+            ModelState.AddModelErrorIfNotEmpty("AnoPublicacao", livro.AnoPublicacao.ValidarAnoPublicacao());
+            ModelState.AddModelErrorIfNotEmpty("QuantidadeDisponivel", livro.QuantidadeDisponivel.ValidarQuantidadeDisponivel());
+            ModelState.AddModelErrorIfNotEmpty("ISBN", livro.ISBN.ValidarISBN());
+
             if (ModelState.IsValid)
             {
-                livro.Titulo.ValidarTitulo();
-                livro.Autor.ValidarAutor();
-                livro.AnoPublicacao.ValidarAnoPublicacao();
-                livro.QuantidadeDisponivel.ValidarQuantidadeDisponivel();
-                livro.ISBN.ValidarISBN();
-
                 try
                 {
                     _context.Update(livro);
@@ -129,6 +153,7 @@ namespace BibliotecaApp.Controllers.Web
                 }
                 return Json(new { success = true, redirectToUrl = Url.Action("Index", "Livros") });
             }
+
             return View(livro);
         }
 

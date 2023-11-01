@@ -1,4 +1,4 @@
-﻿using BibliotecaApp.Util;
+﻿using BibliotecaApp.Validations;
 using System.ComponentModel.DataAnnotations;
 
 namespace BibliotecaApp.Models
@@ -19,5 +19,8 @@ namespace BibliotecaApp.Models
         public string ISBN { get; set; } = default!;
         [Range(0, 5, ErrorMessage = "A quantidade disponível deve ser entre 0 e 5 livros.")]
         public int QuantidadeDisponivel { get; set; }
+        [Required(ErrorMessage = "A URL da capa é obrigatória")]
+        [Url(ErrorMessage = "Forneça uma URL válida")]
+        public string CapaUrl { get; set; } = string.Empty;
     }
 }
