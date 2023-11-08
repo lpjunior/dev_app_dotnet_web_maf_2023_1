@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using BibliotecaApp.Data;
 using BibliotecaApp.Models;
 using BibliotecaApp.Validations;
-using Microsoft.IdentityModel.Tokens;
 using BibliotecaApp.Extensions;
+using BibliotecaApp.Pages;
 
 namespace BibliotecaApp.Controllers.Web
 {
@@ -13,18 +13,20 @@ namespace BibliotecaApp.Controllers.Web
     public class LivrosController : Controller
     {
         private readonly BibliotecaAppContext _context;
+        private readonly ILogger<LivrosController> _logger;
 
-        public LivrosController(BibliotecaAppContext context)
+        public LivrosController(BibliotecaAppContext context, ILogger<LivrosController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Livros
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return _context.Livro != null ?
-                        View(await _context.Livro.ToListAsync()) :
+            return _context.Livros != null ?
+                        View(await _context.Livros.ToListAsync()) :
                         Problem("Entity set 'BibliotecaAppContext.Livro'  is null.");
         }
 
@@ -33,8 +35,8 @@ namespace BibliotecaApp.Controllers.Web
         [HttpGet("List")]
         public async Task<IActionResult> List()
         {
-            return _context.Livro != null ?
-                        View(await _context.Livro.ToListAsync()) :
+            return _context.Livros != null ?
+                        View(await _context.Livros.ToListAsync()) :
                         Problem("Entity set 'BibliotecaAppContext.Livro'  is null.");
         }
 
@@ -42,12 +44,12 @@ namespace BibliotecaApp.Controllers.Web
         [HttpGet("Details/{id:guid}")]
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.Livro == null)
+            if (id == null || _context.Livros == null)
             {
                 return NotFound();
             }
 
-            var livro = await _context.Livro
+            var livro = await _context.Livros
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (livro == null)
             {
@@ -79,7 +81,7 @@ namespace BibliotecaApp.Controllers.Web
             ModelState.AddModelErrorIfNotEmpty("QuantidadeDisponivel", livro.QuantidadeDisponivel.ValidarQuantidadeDisponivel());
             ModelState.AddModelErrorIfNotEmpty("ISBN", livro.ISBN.ValidarISBN());
 
-            var livroExistente = await _context.Livro.FirstOrDefaultAsync(l => l.ISBN == livro.ISBN);
+            var livroExistente = await _context.Livros.FirstOrDefaultAsync(l => l.ISBN == livro.ISBN);
             if(livroExistente != null)
             {
                 ModelState.AddModelErrorIfNotEmpty("ISBN", "ISBN já registrado");
@@ -100,12 +102,12 @@ namespace BibliotecaApp.Controllers.Web
         [HttpGet("Edit/{id:guid}")]
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.Livro == null)
+            if (id == null || _context.Livros == null)
             {
                 return NotFound();
             }
 
-            var livro = await _context.Livro.FindAsync(id);
+            var livro = await _context.Livros.FindAsync(id);
             if (livro == null)
             {
                 return NotFound();
@@ -116,7 +118,8 @@ namespace BibliotecaApp.Controllers.Web
         // PUT: Livros/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPut("Edit/{id:guid}")]
+        [HttpPut]
+        [Route("Edit/{id:guid}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, [Bind("Id,Titulo,Autor,AnoPublicacao,ISBN,QuantidadeDisponivel,CapaUrl")] Livro livro)
         {
@@ -161,12 +164,12 @@ namespace BibliotecaApp.Controllers.Web
         [HttpGet("Delete/{id:guid}")]
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.Livro == null)
+            if (id == null || _context.Livros == null)
             {
                 return NotFound();
             }
 
-            var livro = await _context.Livro
+            var livro = await _context.Livros
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (livro == null)
             {
@@ -181,23 +184,105 @@ namespace BibliotecaApp.Controllers.Web
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.Livro == null)
+            if (_context.Livros == null)
             {
                 return Problem("Entity set 'BibliotecaAppContext.Livro'  is null.");
             }
-            var livro = await _context.Livro.FindAsync(id);
+            var livro = await _context.Livros.FindAsync(id);
             if (livro != null)
             {
-                _context.Livro.Remove(livro);
+                _context.Livros.Remove(livro);
             }
             
             await _context.SaveChangesAsync();
             return Json(new { success = true, redirectToUrl = Url.Action("Index", "Livros") });
         }
 
+        // GET: Livros/Emprestimo/{livroId}
+        [HttpGet("Emprestimo/{livroId:guid}")]
+        public async Task<IActionResult> Emprestimo([FromRoute] Guid? livroId)
+        {
+            var livro = await _context.Livros.FindAsync(livroId);
+
+            if (livro is null)
+                return NotFound();
+
+            var viewModel = new EmprestimoViewModel
+            {
+                LivroId = livroId!.Value,
+                Titulo = livro.Titulo,
+                LivroDisponivel = livro.QuantidadeDisponivel > 0,
+                DataRetirada = DateOnly.FromDateTime(DateTime.Today), // Inicialização direta aqui
+                DataPrevistaDevolucao = DateOnly.FromDateTime(DateTime.Today.AddDays(7)) // Inicialização direta aqui
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Livros/Emprestimo
+        [HttpPost("Emprestimo")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Emprestimo([Bind("LivroId,UsuarioId")] Guid livroId, Guid UsuarioId)
+        {
+            var livro = await _context.Livros.FindAsync(livroId);
+
+            if(livro is null)
+                return NotFound();
+
+            if(livro.QuantidadeDisponivel <= 0)
+            {
+                return View("Error", new ErrorModel { Message = "Livro não disponível para emprestimo." });
+            }
+
+            var emprestimo = new Emprestimo
+            {
+                LivroId = livroId,
+                DataRetirada = DateOnly.FromDateTime(DateTime.Now.Date)
+            };
+
+            _context.Add(emprestimo);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ConfirmacaoEmprestimo", new { emprestimoId = emprestimo.Id });
+        }
+
+        // GET: Livros/ConfirmacaoEmprestimo/{id}
+        [HttpGet("ConfirmacaoEmprestimo/{id}")]
+        public async Task<IActionResult> ConfirmacaoEmprestimo(Guid id)
+        {
+            var emprestimo = await _context.Emprestimos.Include(emp => emp.Livro).FirstOrDefaultAsync(emp => emp.Id == id);
+
+            if (emprestimo == null)
+            {
+                return NotFound();
+            }
+            
+            return View(emprestimo);
+        }
+
+        // GET: Livros/Reserva
+        [HttpGet("Reserva")]
+        public IActionResult Reserva()
+        {
+            return View();
+        }
+
+        // POST: Livros/Reserva
+        [HttpPost("Reserva")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reserva([Bind("LivroId")] Guid livroId)
+        {
+            var livro = await _context.Livros.FindAsync(livroId);
+
+            if (livro is null)
+                return NotFound();
+
+            return View();
+        }
+
         private bool LivroExists(Guid id)
         {
-          return (_context.Livro?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Livros?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

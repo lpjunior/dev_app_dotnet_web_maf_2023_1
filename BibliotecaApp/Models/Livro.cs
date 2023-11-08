@@ -5,6 +5,7 @@ namespace BibliotecaApp.Models
 {
     public class Livro
     {
+        [Key]
         public Guid Id { get; set; }
         [Required(ErrorMessage = "O título é obrigatório")]
         [StringLength(255, MinimumLength = 3, ErrorMessage = "O título deve ter entre 3 e 255 caracteres.")]

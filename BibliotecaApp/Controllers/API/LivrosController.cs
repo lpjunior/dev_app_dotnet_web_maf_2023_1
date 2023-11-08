@@ -20,23 +20,23 @@ namespace BibliotecaApp.Controllers.API
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Livro>>> GetLivro()
         {
-            if (_context.Livro == null)
+            if (_context.Livros == null)
             {
                 return NotFound();
             }
-            return await _context.Livro.ToListAsync();
+            return await _context.Livros.ToListAsync();
         }
 
         // GET: api/Livros/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Livro>> GetLivro([FromRoute] int id)
         {
-            if (_context.Livro == null)
+            if (_context.Livros == null)
             {
                 return NotFound();
             }
 
-            var livro = await _context.Livro.FindAsync(id);
+            var livro = await _context.Livros.FindAsync(id);
 
             if (livro == null)
             {
@@ -81,11 +81,11 @@ namespace BibliotecaApp.Controllers.API
         [HttpPost]
         public async Task<ActionResult<Livro>> PostLivro([FromBody] Livro livro)
         {
-            if (_context.Livro == null)
+            if (_context.Livros == null)
             {
                 return Problem("Entity set 'BibliotecaAppContext.Livro'  is null.");
             }
-            _context.Livro.Add(livro);
+            _context.Livros.Add(livro);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetLivro", new { id = livro.Id }, livro);
@@ -95,17 +95,17 @@ namespace BibliotecaApp.Controllers.API
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLivro([FromRoute] int id)
         {
-            if (_context.Livro == null)
+            if (_context.Livros == null)
             {
                 return NotFound();
             }
-            var livro = await _context.Livro.FindAsync(id);
+            var livro = await _context.Livros.FindAsync(id);
             if (livro == null)
             {
                 return NotFound();
             }
 
-            _context.Livro.Remove(livro);
+            _context.Livros.Remove(livro);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -113,7 +113,7 @@ namespace BibliotecaApp.Controllers.API
 
         private bool LivroExists(Guid id)
         {
-            return (_context.Livro?.Any(e => e.Id.ToString().Equals(id.ToString()))).GetValueOrDefault();
+            return (_context.Livros?.Any(e => e.Id.ToString().Equals(id.ToString()))).GetValueOrDefault();
         }
     }
 }

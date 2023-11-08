@@ -4,6 +4,7 @@ using BibliotecaApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BibliotecaApp.Migrations
 {
     [DbContext(typeof(BibliotecaAppContext))]
-    partial class BibliotecaAppContextModelSnapshot : ModelSnapshot
+    [Migration("20231108004048_AddEmprestimoUpdate")]
+    partial class AddEmprestimoUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,10 +32,10 @@ namespace BibliotecaApp.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DataDevolucao")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DataRetirada")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("LivroId")
                         .HasColumnType("uniqueidentifier");

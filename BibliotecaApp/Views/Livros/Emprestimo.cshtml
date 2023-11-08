@@ -1,0 +1,50 @@
+﻿@model BibliotecaApp.Models.EmprestimoViewModel
+
+@{
+    ViewData["Title"] = "Novo Empréstimo";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h2>Novo Empréstimo</h2>
+@if (Model.LivroDisponivel)
+{
+    <div class="row">
+        <div class="col-md-4">
+            <form id="emprestimo" asp-route-id="@Model.LivroId" asp-action="Emprestimo">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="LivroId" />
+                <div class="form-group">
+                    <label asp-for="Titulo" class="control-label"></label>
+                    <input readonly asp-for="Titulo" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="DataRetirada" class="control-label"></label>
+                    <input readonly asp-for="DataRetirada" asp-format="{0:yyyy-MM-dd}" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="DataPrevistaDevolucao" class="control-label"></label>
+                    <input readonly asp-for="DataPrevistaDevolucao" asp-format="{0:yyyy-MM-dd}" class="form-control" />
+                </div>
+                <div class="form-group my-2">
+                    <button type="submit" class="btn btn-primary">Confirmar Empréstimo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        O livro selecionado não está disponível no momento.
+    </div>
+}
+
+<div>
+    <a asp-action="Index">Voltar para o menu principal</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

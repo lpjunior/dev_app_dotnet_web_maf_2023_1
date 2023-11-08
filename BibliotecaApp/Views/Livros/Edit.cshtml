@@ -11,7 +11,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form id="edit" asp-action="Edit">
+        <form id="edit" asp-route-id="@Model.Id" asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -72,6 +72,12 @@
                     data: $(this).serialize(),
                     success: function (response) {
                         window.location.href = response.redirectToUrl;
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // Lidar com o erro aqui
+                        alert('Houve um erro ao editar o livro: ' + errorThrown);
+                        // Parar o carregamento da página
+                        e.preventDefault();
                     }
                 });
             });

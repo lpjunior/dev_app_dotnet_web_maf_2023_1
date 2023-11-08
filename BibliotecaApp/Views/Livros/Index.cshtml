@@ -18,10 +18,9 @@
                     <p class="card-text">Ano: @livro.AnoPublicacao</p>
                     <p class="card-text">ISBN: @livro.ISBN</p>
                     <p class="card-text">Quantidade: @livro.QuantidadeDisponivel</p>
-                    <a href="#" class="btn btn-primary">Reservar</a>
+                    <a href="@Url.Action("Emprestimo", "Livros", new { livroId = livro.Id })" class="btn btn-primary">Empréstimo</a>
                 </div>
             </div>
         </div>
     }
 </div>
-

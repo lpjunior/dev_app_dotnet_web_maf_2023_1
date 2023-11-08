@@ -1,0 +1,23 @@
+﻿@page
+@model BibliotecaApp.Models.Emprestimo
+@{
+    ViewData["Title"] = "Confirmação de Emprestimo";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h1>Confirmação de Emprestimo</h1>
+    <p>Livro emprestado com sucesso!</p>
+
+    <div>
+        <h2>@Model.Livro.Titulo</h2>
+        <h2>Autor: @Model.Livro.Autor</h2>
+        <h2>Data de emprestimo: @Model.DataRetirada.ToString("dd/MM/yyyy")</h2>
+        <h2>Data Prevista de Devolução: @Model.DataPrevistaDevolucao().ToString("dd/MM/yyyy")</h2>
+        @if (Model.DataDevolucao != DateOnly.MinValue)
+        {
+            <h2>Data Devolução: @Model.DataDevolucao!.Value.ToString("dd/MM/yyyy")</h2>
+        }
+    </div>
+    <a href="@Url.Action("Index", "Livros")" class="btn btn-primary">Volta para o menu inicial</a>
+</div>

@@ -51,3 +51,14 @@ body {
     text-overflow: ellipsis;
     max-width: 200px;
 }
+
+.error-page {
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.error-message {
+    font-size: 1.2em;
+    color: #d9534f;
+}
