@@ -10,12 +10,13 @@ namespace BibliotecaApp.Models
 
         [Required(ErrorMessage = "O ID do livro é obrigatório")]
 
-
-        // foreign key(livroId) references Livro(id)
-
         public Guid LivroId { get; set; }
         [ForeignKey("LivroId")]
         public virtual Livro Livro { get; set; } = default!;
+
+        public string UsuarioId { get; set; } = default!;
+        [ForeignKey("UsuarioId")]
+        public virtual Usuario Usuario { get; set; } = default!;
 
         [Required(ErrorMessage = "A data de retirada do livro é obrigatória")]
         [DataType(DataType.Date)]

@@ -5,13 +5,11 @@
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<h1>Livros</h1>
-
-<h4>Livro</h4>
+<h2>Livros</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Livros">
+        <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Titulo" class="control-label"></label>

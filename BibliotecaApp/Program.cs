@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BibliotecaApp.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using BibliotecaApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,10 @@ builder.Services.AddCors(options => options.AddPolicy(
 ));
 builder.Services.AddDbContext<BibliotecaAppContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BibliotecaAppContext") ?? throw new InvalidOperationException("Connection string 'BibliotecaAppContext' not found.")));
+
+builder.Services.AddIdentity<Usuario, IdentityRole>()
+    .AddEntityFrameworkStores<BibliotecaAppContext>() // inclusão do pacote Microsoft.AspNetCore.Identity.EntityFrameworkCore
+    .AddDefaultTokenProviders();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -42,6 +48,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

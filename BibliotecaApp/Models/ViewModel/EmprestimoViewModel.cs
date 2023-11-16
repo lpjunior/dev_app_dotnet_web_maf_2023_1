@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BibliotecaApp.Models
+namespace BibliotecaApp.Models.ViewModel
 {
     public class EmprestimoViewModel
     {
@@ -10,6 +10,10 @@ namespace BibliotecaApp.Models
 
         [Display(Name = "Titulo do Livro")]
         public string Titulo { get; set; } = default!;
+
+        [Required(ErrorMessage = "O usuário deve ser informado.")]
+        [Display(Name = "Usuario")]
+        public Guid UsuarioId { get; set; }
 
         [Required]
         [Display(Name = "Livro Disponível")]

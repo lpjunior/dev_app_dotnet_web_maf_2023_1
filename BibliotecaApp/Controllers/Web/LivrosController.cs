@@ -5,6 +5,7 @@ using BibliotecaApp.Models;
 using BibliotecaApp.Validations;
 using BibliotecaApp.Extensions;
 using BibliotecaApp.Pages;
+using BibliotecaApp.Models.ViewModel;
 
 namespace BibliotecaApp.Controllers.Web
 {
@@ -222,7 +223,7 @@ namespace BibliotecaApp.Controllers.Web
         // POST: Livros/Emprestimo
         [HttpPost("Emprestimo")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Emprestimo([Bind("LivroId,UsuarioId")] Guid livroId, Guid UsuarioId)
+        public async Task<IActionResult> Emprestimo([Bind("LivroId,UsuarioId")] Guid livroId, string usuarioId)
         {
             var livro = await _context.Livros.FindAsync(livroId);
 
@@ -237,10 +238,16 @@ namespace BibliotecaApp.Controllers.Web
             var emprestimo = new Emprestimo
             {
                 LivroId = livroId,
+                UsuarioId = usuarioId,
                 DataRetirada = DateOnly.FromDateTime(DateTime.Now.Date)
             };
 
+            livro.QuantidadeDisponivel -= 1;
+
             _context.Add(emprestimo);
+            await _context.SaveChangesAsync();
+
+            _context.Update(livro);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("ConfirmacaoEmprestimo", new { emprestimoId = emprestimo.Id });
@@ -261,7 +268,7 @@ namespace BibliotecaApp.Controllers.Web
         }
 
         // GET: Livros/Reserva
-        [HttpGet("Reserva")]
+        /*[HttpGet("Reserva")]
         public IActionResult Reserva()
         {
             return View();
@@ -278,7 +285,7 @@ namespace BibliotecaApp.Controllers.Web
                 return NotFound();
 
             return View();
-        }
+        }*/
 
         private bool LivroExists(Guid id)
         {

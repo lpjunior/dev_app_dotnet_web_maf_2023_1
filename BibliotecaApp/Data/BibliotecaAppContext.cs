@@ -1,12 +1,12 @@
 ﻿using BibliotecaApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System.ComponentModel;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BibliotecaApp.Data
 {
-    public class BibliotecaAppContext : DbContext
+    public class BibliotecaAppContext : IdentityDbContext<Usuario>
     {
         private readonly IConfiguration _configuration;
 
