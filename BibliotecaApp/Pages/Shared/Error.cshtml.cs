@@ -1,8 +1,8 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Diagnostics;
 
-namespace BibliotecaApp.Pages
+namespace BibliotecaApp.Pages.Shared
 {
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [IgnoreAntiforgeryToken]
@@ -10,7 +10,7 @@ namespace BibliotecaApp.Pages
     {
         public string RequestId { get; set; } = string.Empty;
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-        public required string Message { get; set; }
+        public string Message { get; set; } = "Ocorreu um erro inesperado."; // Valor padrão
 
         public void OnGet()
         {

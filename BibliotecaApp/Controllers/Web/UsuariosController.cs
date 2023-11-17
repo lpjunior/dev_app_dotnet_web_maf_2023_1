@@ -2,6 +2,7 @@
 using BibliotecaApp.Models;
 using BibliotecaApp.Models.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BibliotecaApp.Controllers.Web;
 
@@ -16,13 +17,12 @@ public class UsuariosController : Controller
         _userManager = userManager;
     }
 
-    /*// GET: Usuarios
+    // GET: Usuarios
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        return _context.Usuarios != null ? 
-            View(await _context.Usuarios.ToListAsync()) :
-            Problem("Entity set 'BibliotecaAppContext.Usuarios'  is null.");
+        var users = await _userManager.Users.ToListAsync();
+        return View(users);
     }
 
     // GET: Usuarios/Details/5
@@ -30,20 +30,20 @@ public class UsuariosController : Controller
     public async Task<IActionResult> Details(string? id)
     {
 
-        if (id == null || _context.Usuarios == null)
+        if (id == null)
         {
             return NotFound();
         }
 
-        var usuario = await _context.Usuarios
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (usuario == null)
+        var user = await _userManager.FindByIdAsync(id);
+
+        if (user == null)
         {
             return NotFound();
         }
 
-        return View(usuario);
-    }*/
+        return View(user);
+    }
 
     // GET: Usuarios/Create
     [HttpGet("Create")]
@@ -70,100 +70,125 @@ public class UsuariosController : Controller
         {
             return RedirectToAction(nameof(Index));
         }
+        
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);   
+        }
 
         return View(viewModel);
     }
-/*
+
     // GET: Usuarios/Edit/5
-    [HttpGet("Edit/{id:Guid}")]
-    public async Task<IActionResult> Edit(Guid? id)
+    [HttpGet("Edit/{id}")]
+    public async Task<IActionResult> Edit(string? id)
     {
-        if (id == null || _context.Usuarios == null)
+        if (id == null)
         {
             return NotFound();
         }
 
-        var usuario = await _context.Usuarios.FindAsync(id);
-        if (usuario == null)
+        var user = await _userManager.FindByIdAsync(id);
+        
+        if (user == null)
         {
             return NotFound();
         }
-        return View(usuario);
+
+        var editViewModel = new UsuarioEditViewModel
+        {
+            Id = user.Id,
+            Nome = user.UserName,
+            Email = user.Email
+        };
+        
+        return View(editViewModel);
     }
-
+    
     // PUT: Usuarios/Edit/5
-    [HttpPut("{id}")]
+    [HttpPut]
+    [Route("Edit/{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("Id,Nome,Email,Senha,Type")] Usuario usuario)
+    public async Task<IActionResult> Edit([FromRoute] string id, [Bind("Id,Nome,Email")] UsuarioEditViewModel viewModel)
     {
-        if (id != usuario.Id)
+        if (id != viewModel.Id)
         {
             return NotFound();
         }
 
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid) return View(viewModel);
+        
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
         {
-            try
-            {
-                _context.Update(usuario);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UsuarioExists(usuario.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Index));
+            return NotFound();
         }
-        return View(usuario);
+
+        user.UserName = viewModel.Nome;
+        user.Email = viewModel.Email;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
+        {
+            return Json(new { success = true, redirectToUrl = Url.Action("Index", "Usuarios") });
+        }
+
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);   
+        }
+        
+        return View(viewModel);
     }
 
     // GET: Usuarios/Delete/5
     [HttpGet("Delete/{id}")]
     public async Task<IActionResult> Delete(string? id)
     {
-        if (id == null || _context.Usuarios == null)
+        if (id == null)
         {
             return NotFound();
         }
 
-        var usuario = await _context.Usuarios
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (usuario == null)
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
         {
             return NotFound();
         }
 
-        return View(usuario);
+        return View(user);
     }
 
-    // POST: Usuarios/Delete/5
-    [HttpDelete("Delete/{id:Guid}")]
+    // DELETE: Usuarios/Delete/5
+    [HttpDelete("Delete/{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(Guid id)
+    public async Task<IActionResult> DeleteConfirmed(string? id)
     {
-        if (_context.Usuarios == null)
+        if (id == null)
         {
-            return Problem("Entity set 'BibliotecaAppContext.Usuarios'  is null.");
+            return NotFound();
         }
-        var usuario = await _context.Usuarios.FindAsync(id);
-        if (usuario != null)
+        
+        var user = await _userManager.FindByIdAsync(id);
+        
+        if (user == null)
         {
-            _context.Usuarios.Remove(usuario);
+            return NotFound();
         }
-            
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+
+        var result = await _userManager.DeleteAsync(user);
+
+        if (result.Succeeded)
+        {
+            return Json(new { success = true, redirectToUrl = Url.Action("Index", "Usuarios") });
+        }
+        
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);   
+        }
+
+        return View("Delete", user);
     }
-    
-    private bool UsuarioExists(string id)
-    {
-        return (_context.Usuarios?.Any(e => e.Id == id)).GetValueOrDefault();
-    }*/
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BibliotecaApp.Data;
 using BibliotecaApp.Models;
@@ -6,6 +7,8 @@ using BibliotecaApp.Validations;
 using BibliotecaApp.Extensions;
 using BibliotecaApp.Pages;
 using BibliotecaApp.Models.ViewModel;
+using BibliotecaApp.Pages.Shared;
+using Microsoft.AspNetCore.Identity;
 
 namespace BibliotecaApp.Controllers.Web
 {
@@ -208,9 +211,15 @@ namespace BibliotecaApp.Controllers.Web
             if (livro is null)
                 return NotFound();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            if (userId is null)
+                return NotFound();
+
             var viewModel = new EmprestimoViewModel
             {
                 LivroId = livroId!.Value,
+                UsuarioId = userId,
                 Titulo = livro.Titulo,
                 LivroDisponivel = livro.QuantidadeDisponivel > 0,
                 DataRetirada = DateOnly.FromDateTime(DateTime.Today), // Inicialização direta aqui
@@ -229,10 +238,10 @@ namespace BibliotecaApp.Controllers.Web
 
             if(livro is null)
                 return NotFound();
-
+            
             if(livro.QuantidadeDisponivel <= 0)
             {
-                return View("Error", new ErrorModel { Message = "Livro não disponível para emprestimo." });
+                return View("Error", new ErrorModel { Message = "Livro não disponível para empréstimo." });
             }
 
             var emprestimo = new Emprestimo
@@ -250,7 +259,7 @@ namespace BibliotecaApp.Controllers.Web
             _context.Update(livro);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("ConfirmacaoEmprestimo", new { emprestimoId = emprestimo.Id });
+            return RedirectToAction("ConfirmacaoEmprestimo", new { id = emprestimo.Id });
         }
 
         // GET: Livros/ConfirmacaoEmprestimo/{id}

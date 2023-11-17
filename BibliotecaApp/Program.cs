@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BibliotecaApp.Data;
+using BibliotecaApp.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using BibliotecaApp.Models;
@@ -14,7 +15,7 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
 builder.Services.AddCors(options => options.AddPolicy(
-    "CorsPolicies", builder => builder
+    "CorsPolicies", b => b
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
@@ -23,7 +24,10 @@ builder.Services.AddCors(options => options.AddPolicy(
 builder.Services.AddDbContext<BibliotecaAppContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BibliotecaAppContext") ?? throw new InvalidOperationException("Connection string 'BibliotecaAppContext' not found.")));
 
-builder.Services.AddIdentity<Usuario, IdentityRole>()
+builder.Services.AddIdentity<Usuario, IdentityRole>(options =>
+    {
+        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
+    })
     .AddEntityFrameworkStores<BibliotecaAppContext>() // inclusão do pacote Microsoft.AspNetCore.Identity.EntityFrameworkCore
     .AddDefaultTokenProviders();
 
@@ -56,5 +60,7 @@ app.MapControllers();
 app.MapRazorPages();
 
 app.UseCors("CorsPolicies");
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.Run();

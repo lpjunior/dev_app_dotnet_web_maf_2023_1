@@ -1,23 +1,50 @@
-﻿@page
-@model BibliotecaApp.Models.Emprestimo
+﻿@model BibliotecaApp.Models.Emprestimo
 @{
     ViewData["Title"] = "Confirmação de Emprestimo";
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1>Confirmação de Emprestimo</h1>
-    <p>Livro emprestado com sucesso!</p>
-
-    <div>
-        <h2>@Model.Livro.Titulo</h2>
-        <h2>Autor: @Model.Livro.Autor</h2>
-        <h2>Data de emprestimo: @Model.DataRetirada.ToString("dd/MM/yyyy")</h2>
-        <h2>Data Prevista de Devolução: @Model.DataPrevistaDevolucao().ToString("dd/MM/yyyy")</h2>
-        @if (Model.DataDevolucao != DateOnly.MinValue)
-        {
-            <h2>Data Devolução: @Model.DataDevolucao!.Value.ToString("dd/MM/yyyy")</h2>
+@section Styles {
+    <style>
+        .emp-container {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
         }
+
+        .emp-container h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .emp-detail {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .btn-primary {
+            margin-top: 20px;
+        }
+    </style>
+}
+
+<div class="container emp-container">
+    <div class="text-center">
+        <h1>Confirmação de Emprestimo</h1>
+        <p class="emp-detail">Livro emprestado com sucesso!</p>
+
+        <div>
+            <p class="emp-detail"><strong>Título:</strong> @Model.Livro.Titulo</p>
+            <p class="emp-detail"><strong>Autor:</strong> @Model.Livro.Autor</p>
+            <p class="emp-detail"><strong>Data de empréstimo:</strong> @Model.DataRetirada.ToString("dd/MM/yyyy")</p>
+            <p class="emp-detail"><strong>Data Prevista de Devolução:</strong> @Model.DataPrevistaDevolucao().ToString("dd/MM/yyyy")</p>
+            @if (Model.DataDevolucao.HasValue && Model.DataDevolucao.Value != DateOnly.MinValue)
+            {
+                <p class="emp-detail"><strong>Data de Devolução:</strong> @Model.DataDevolucao.Value.ToString("dd/MM/yyyy")</p>
+            }
+        </div>
+        <a href="@Url.Action("Index", "Livros")" class="btn btn-primary">Voltar para o menu inicial</a>
     </div>
-    <a href="@Url.Action("Index", "Livros")" class="btn btn-primary">Volta para o menu inicial</a>
 </div>

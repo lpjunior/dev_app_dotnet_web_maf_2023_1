@@ -13,7 +13,7 @@ namespace BibliotecaApp.Models.ViewModel
 
         [Required(ErrorMessage = "O usuário deve ser informado.")]
         [Display(Name = "Usuario")]
-        public Guid UsuarioId { get; set; }
+        public string UsuarioId { get; set; } = default!;
 
         [Required]
         [Display(Name = "Livro Disponível")]

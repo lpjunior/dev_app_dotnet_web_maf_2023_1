@@ -11,7 +11,7 @@
 <div class="row">
     <div class="col-md-4">
         <!-- GAMBIARRA => asp-route-LivroId="" -->
-        <form asp-action="Emprestimo" asp-controller="Livros" asp-route-LivroId="" method="post">
+        <form asp-action="Emprestimo" asp-controller="Livros" asp-route-LivroId="">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <!-- Campos ocultos para LivroId e UsuarioId -->
             <input type="hidden" asp-for="LivroId"/>
