@@ -3,11 +3,13 @@ using BibliotecaApp.Models;
 using BibliotecaApp.Models.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BibliotecaApp.Controllers.Web;
 
 [Route("[controller]")]
 [ApiExplorerSettings(IgnoreApi = true)]
+[Authorize(Policy = "AdminOnly")]
 public class UsuariosController : Controller
 {
     private readonly UserManager<Usuario> _userManager;
@@ -68,6 +70,9 @@ public class UsuariosController : Controller
 
         if(result.Succeeded)
         {
+            await _userManager.AddToRoleAsync(usuario, "Cliente");
+            await _userManager.AddClaimAsync(usuario, new System.Security.Claims.Claim("Profile", "Cliente"));
+
             return RedirectToAction(nameof(Index));
         }
         

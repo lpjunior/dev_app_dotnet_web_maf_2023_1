@@ -10,7 +10,7 @@ public class Usuario : IdentityUser
 {
     [Required(ErrorMessage = "O tipo é obrigatório.")]
     [Display(Name = "Tipo")]
-    public UsuarioType Type { get; set; } = UsuarioType.Usuario;
+    public UsuarioType Type { get; set; } = UsuarioType.Cliente;
     
     [Display(Name = "Data de Criação")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

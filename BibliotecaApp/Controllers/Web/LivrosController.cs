@@ -9,6 +9,7 @@ using BibliotecaApp.Pages;
 using BibliotecaApp.Models.ViewModel;
 using BibliotecaApp.Pages.Shared;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BibliotecaApp.Controllers.Web
 {
@@ -204,6 +205,7 @@ namespace BibliotecaApp.Controllers.Web
 
         // GET: Livros/Emprestimo/{livroId}
         [HttpGet("Emprestimo/{livroId:guid}")]
+        [Authorize(Policy = "ClientOnly")]
         public async Task<IActionResult> Emprestimo([FromRoute] Guid? livroId)
         {
             var livro = await _context.Livros.FindAsync(livroId);
@@ -232,6 +234,7 @@ namespace BibliotecaApp.Controllers.Web
         // POST: Livros/Emprestimo
         [HttpPost("Emprestimo")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "ClientOnly")]
         public async Task<IActionResult> Emprestimo([Bind("LivroId,UsuarioId")] Guid livroId, string usuarioId)
         {
             var livro = await _context.Livros.FindAsync(livroId);

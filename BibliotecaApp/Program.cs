@@ -4,6 +4,9 @@ using BibliotecaApp.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using BibliotecaApp.Models;
+using Microsoft.AspNetCore.Authorization;
+using BibliotecaApp.Handlers;
+using BibliotecaApp.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,15 +37,48 @@ builder.Services.AddIdentity<Usuario, IdentityRole>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Login";
+    options.AccessDeniedPath = "/Login";
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ClientOnly", policy => policy.Requirements.Add(new ClientOnlyRequirement()));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrador"));
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, ClientOnlyHandler>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        // Obter o RoleManager eo Usermanager
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = services.GetRequiredService<UserManager<Usuario>>();
+
+
+        // Chamada dos métodos de Seed
+        await SeedConfiguration.SeedRoles(roleManager);
+        await SeedConfiguration.SeedUsers(userManager); 
+
+    } catch (Exception e) { 
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(e, "Ocorreu um erro durante o seeding inicial.");
+    }
 }
+
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Error");
+        app.UseHsts();
+    }
 
 app.UseSwagger();
 app.UseSwaggerUI();
